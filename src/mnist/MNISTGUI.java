@@ -4,13 +4,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * GUI front end for interacting with a neural net 
+ */
 public class MNISTGUI extends JFrame {
+    /** Default GUI width in pixels*/
     private static final int WIDTH = 450;
+
+    /** Default GUI width in pixels*/
     private static final int HEIGHT = 700;
+
+    /** GUI title */
     private static final String TITLE = "MNIST Neural Network";
+
+    /** Path to training and test data */
     private static final String PATH = "res/mnist/";
-    private static final String[] digits =
-            {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     // GUI COMPONENTS //
     /** Displays image */
@@ -51,13 +59,19 @@ public class MNISTGUI extends JFrame {
     /** Test labels used to verify network */
     private int[] testLabels;
 
+    /**
+     * Constructs an instance of the GUI and displays it on the screen
+     */
     public MNISTGUI() {
+        // Load the training and test data sets
         loadData();
+
+        // Create a 
         network = new MNISTNeuralNetwork(30);
 
+        // Set basic GUI properties
         setSize(WIDTH, HEIGHT);
         setTitle(TITLE);
-        //setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         addComponents();
         randomImage();
@@ -146,17 +160,11 @@ public class MNISTGUI extends JFrame {
         int r = (int) (Math.random() * trainingImages.size());
         int[][] image = trainingImages.get(r);
 
-//        for (r = 0; r < MNISTReader.MNIST_IMAGE_SIZE; r++) {
-//            for (int c = 0; c < MNISTReader.MNIST_IMAGE_SIZE; c++) {
-//                image[r][c] = (int) (256 * Math.random());
-//            }
-//        }
-
         // Put on the viewer
         setViewer(image);
 
         // Set bar graph
-        setBars(network.evaluate(image));
+        setBars(network.evaluate(image), trainingLabels[r]);
     }
 
     /**
@@ -180,10 +188,11 @@ public class MNISTGUI extends JFrame {
 
     /**
      * Sets the bars underneath the image using the network's output. Bigger
-     * bars for a digit indicate the network is more confident of its answer
-     * @param networkOutput
+     * bars for a digit indicate the network is more confident of its answer.
+     * @param networkOutput - output from neural net.
+     * @param correctLabel - actual classification of image.
      */
-    private void setBars(double[] networkOutput) {
+    private void setBars(double[] networkOutput, int correctLabel) {
         // Normalize output and convert to percentages
         double sum = 0;
         for (double aLi : networkOutput) {
@@ -205,6 +214,12 @@ public class MNISTGUI extends JFrame {
             bar.setValue(barSizes[i]);
             bar.setStringPainted(true);
             bar.setString(Integer.toString(i));
+
+            // Add an indication of what the correct classification is
+            if (i == correctLabel) {
+                bar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            }
+
             bars.add(bar);
         }
     }
