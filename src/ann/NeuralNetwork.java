@@ -2,6 +2,12 @@ package ann;
 
 import java.util.*;
 
+// TODO - keep working on documentation. Also add throws annotations to methods.
+
+/**
+ * Represents a multi-layered neural network. The network can have an arbitrary
+ * number of hidden layers with an arbitrary number of neurons in each layer.
+ */
 public class NeuralNetwork {
     /** Weights */
     private double[][][] w;
@@ -9,30 +15,45 @@ public class NeuralNetwork {
     /** Biases */
     private double[][] b;
 
-    /** Number of layers */
-    private final int N_LAYERS;
-
     /** Number of neurons per layer */
     private final int[] NEURONS;
 
+    /** Number of layers */
+    private final int N_LAYERS;
+
+    /** Size of input */
+    public final int INPUT_SIZE;
+
+    /** Size of output */
+    public final int OUTPUT_SIZE;
+
     /**
-     * Creates a new, multi-layered neural network.
+     * Creates a new, multi-layered neural network with a given number of neurons in
+     * each layer.
+     * 
      * @param neurons - number of neurons in each layer. For example the
-     *               array layers = [12, 6, 4] would have 12 input neurons, 6
-     *               hidden-layer neurons and 4 output neurons.
+     *                array layers = [12, 6, 4] would have 12 input neurons, 6
+     *                hidden-layer neurons and 4 output neurons.
      */
     public NeuralNetwork(int[] neurons) {
         /*
-         Dimension arrays for w and b. Note that even though we are
-         both has having N_LAYERS in the outermost dimension we will only
-         actually be using layers 1 to N_LAYERS - 1. This will help us
-         maintain consistency with the notation in our reference material:
+         * Dimension arrays for w and b. Note that even though both arrays have N_LAYERS
+         * in the outermost dimension we will only actually be using layers 1 to
+         * N_LAYERS - 1. This will help us maintain consistency with the notation in our
+         * reference material:
+         * 
+         * http://neuralnetworksanddeeplearning.com/chap2.html
+         */
 
-         http://neuralnetworksanddeeplearning.com/chap2.html
-        */
+        // Validate given network size
+        if (neurons.length < 2) {
+            throw new IllegalArgumentException("Invalid network size. Network must have at least 2 layers.");
+        }
 
         NEURONS = neurons;
         N_LAYERS = neurons.length;
+        INPUT_SIZE = NEURONS[0];
+        OUTPUT_SIZE = NEURONS[1];
         w = new double[N_LAYERS][][];
         b = new double[N_LAYERS][];
 
@@ -45,7 +66,7 @@ public class NeuralNetwork {
     }
 
     /**
-     * Resets the network by assigning gaussian random values to w and b
+     * Resets the network by assigning Gaussian random values to w and b
      */
     private void randomizeWeightsAndBiases() {
         Random random = new Random();
@@ -61,11 +82,12 @@ public class NeuralNetwork {
     }
 
     /**
-     * Trains the network using randomized minibatches from the training
-     * examples given
-     * @param x - training inputs
-     * @param y - training outputs
-     * @param eta - learning rate
+     * Trains the network using randomized minibatches from a set of training
+     * examples.
+     * 
+     * @param x         - training inputs
+     * @param y         - training outputs
+     * @param eta       - learning rate, must be > 0
      * @param batchSize - number of examples per minibatch, must evenly
      *                  divide the total number of training inputs
      */
@@ -76,8 +98,8 @@ public class NeuralNetwork {
             throw new IllegalArgumentException(msg);
         }
 
-        if (eta < 0) {
-            String msg = "Invalid training rate eta: " + eta;
+        if (eta <= 0) {
+            String msg = "Invalid training rate eta: " + eta + ". Must be >= 0.";
             throw new IllegalArgumentException(msg);
         }
 
@@ -118,10 +140,11 @@ public class NeuralNetwork {
     }
 
     /**
-     * Performs a steepest gradient descent step updating the weights and
-     * biases for the network using the average slope from all the examples
-     * @param x - training inputs
-     * @param y - training outputs
+     * Performs a steepest gradient descent step, updating the weights and
+     * biases for the network using the average slope from all the examples.
+     * 
+     * @param x   - training inputs
+     * @param y   - training outputs
      * @param eta - learning rate
      */
     private void sgd(double[][] x, double[][] y, double eta) {
@@ -140,6 +163,7 @@ public class NeuralNetwork {
         double[][][] dCdw = new double[N_LAYERS][][];
         double[][] dCdb = new double[N_LAYERS][];
 
+        // Initialize arrays
         for (int l = 1; l < N_LAYERS; l++) {
             a[l] = new double[NEURONS[l]];
             z[l] = new double[NEURONS[l]];
@@ -173,7 +197,7 @@ public class NeuralNetwork {
             for (int l = 1; l < N_LAYERS; l++) {
                 for (int j = 0; j < NEURONS[l]; j++) {
                     for (int k = 0; k < NEURONS[l - 1]; k++) {
-                        dCdw[l][j][k] += a[l-1][k] * delta[l][j];
+                        dCdw[l][j][k] += a[l - 1][k] * delta[l][j];
                     }
 
                     dCdb[l][j] += delta[l][j];
@@ -194,14 +218,15 @@ public class NeuralNetwork {
     }
 
     /**
-     * Evaluates the neural network for an input x
-     * @param x
+     * Evaluates the neural network for an input x.
+     * 
+     * @param x - input, must be
      * @return
      */
     public double[] evaluate(double[] x) {
         if (x.length != NEURONS[0]) {
             String msg = "Invalid size for x: " + x.length + ", " +
-                    b[0].length + " required";
+                    INPUT_SIZE + " required";
             throw new IllegalArgumentException(msg);
         }
 
@@ -218,9 +243,9 @@ public class NeuralNetwork {
     /**
      * Performs the matrix multiplication m*v where m is a rank-2 array m (a
      * matrix) and v is a rank-1 array. Note, that this assumes that the
-     * elements of v represent a column vector, though it's stored as an
+     * elements of v represent a column vector, though it's stored as a flat
      * array for ease of use.
-
+     * 
      * @param m - rank-2 array with dimensions nr x nc
      * @param v - array with length nc
      * @return - array with length nr representing m*v
@@ -239,7 +264,7 @@ public class NeuralNetwork {
         double[] mv = new double[m.length];
         for (int i = 0; i < m.length; i++) {
             for (int j = 0; j < v.length; j++) {
-                mv[i] += m[i][j]*v[j];
+                mv[i] += m[i][j] * v[j];
             }
         }
 
@@ -248,11 +273,13 @@ public class NeuralNetwork {
 
     /**
      * Tranposes a rank-2 array (matrix) m, returning the transposed
-     * matrix mT where mT[i][j] = m[j][i] (i.e. rows and columns flipped)
+     * matrix mT where mT[i][j] = m[j][i] (i.e. rows and columns flipped).
+     * 
      * @param m - input matrix
      * @return the transposed matrix
      */
     private static double[][] transpose(double[][] m) {
+        // Validate consistency of dimensions in input matrix
         for (double[] r : m) {
             if (r.length != m[0].length) {
                 String msg = "Inconsistent dimensions in m";
@@ -273,7 +300,7 @@ public class NeuralNetwork {
     }
 
     /**
-     * Calculates the hadamard (element-wise) product of two arrays.
+     * Calculates the Hadamard (element-wise) product of two arrays.
      *
      * @param a
      * @param b
@@ -289,19 +316,21 @@ public class NeuralNetwork {
         final int N = a.length;
         double[] had = new double[N];
         for (int i = 0; i < N; i++) {
-            had[i] = a[i]*b[i];
+            had[i] = a[i] * b[i];
         }
 
         return had;
     }
 
     /**
-     * Returns the element-wise sum of two arrays
+     * Returns the element-wise sum of two arrays.
+     * 
      * @param a
      * @param b
      * @return array s such that s[i] = a[i] + b[i]
      */
     private static double[] sum(double[] a, double[] b) {
+        // Validate 
         if (a.length != b.length) {
             String msg = "Dimension mismatch: a.length = " + a.length +
                     ", b.length = " + b.length;
@@ -318,7 +347,8 @@ public class NeuralNetwork {
     }
 
     /**
-     * Returns the element-wise difference of two arrays
+     * Returns the element-wise difference of two arrays.
+     * 
      * @param a
      * @param b
      * @return array s such that s[i] = a[i] - b[i]
@@ -340,7 +370,8 @@ public class NeuralNetwork {
     }
 
     /**
-     * Returns an array consisting of the sigmoid function of each element in z
+     * Returns an array consisting of the sigmoid function of each element in z.
+     * 
      * @param z
      * @return the array sig where sig[i] = sigmoid(z[i])
      */
@@ -356,7 +387,8 @@ public class NeuralNetwork {
     }
 
     /**
-     * Returns an array consisting of the sigmoid function of each element in z
+     * Returns an array consisting of the sigmoid function of each element in z.
+     * 
      * @param z
      * @return the array sig where sig[i] = sigmoid(z[i])
      */
@@ -365,7 +397,7 @@ public class NeuralNetwork {
         double[] sigPrime = new double[SIZE];
 
         for (int i = 0; i < SIZE; i++) {
-            sigPrime[i] = sigmoid(z[i])*(1 - sigmoid(z[i]));
+            sigPrime[i] = sigmoid(z[i]) * (1 - sigmoid(z[i]));
         }
 
         return sigPrime;
