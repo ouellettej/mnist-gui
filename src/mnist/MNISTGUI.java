@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+// TODO - add shading to box indicating network's classification
+
 /**
  * GUI front end for interacting with a neural net 
  */
