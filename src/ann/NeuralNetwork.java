@@ -2,8 +2,6 @@ package ann;
 
 import java.util.*;
 
-// TODO - keep working on documentation. Also add throws annotations to methods.
-
 /**
  * Represents a multi-layered neural network. The network can have an arbitrary
  * number of hidden layers with an arbitrary number of neurons in each layer.
