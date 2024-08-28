@@ -34,6 +34,8 @@ public class NeuralNetwork {
      * @param neurons - number of neurons in each layer. For example the
      *                array layers = [12, 6, 4] would have 12 input neurons, 6
      *                hidden-layer neurons and 4 output neurons.
+     * 
+     * @throws IllegalArgumentException if less than 2 layers are specified
      */
     public NeuralNetwork(int[] neurons) {
         /*
@@ -90,6 +92,11 @@ public class NeuralNetwork {
      * @param eta       - learning rate, must be > 0
      * @param batchSize - number of examples per minibatch, must evenly
      *                  divide the total number of training inputs
+     * 
+     * @throws IllegalArgumentException if there is a mismatch in the size of
+     *                                  training inputs and outputs, an invalid
+     *                                  learning rate, or a batch size that does not
+     *                                  evenly divide the training set.
      */
     public void train(double[][] x, double[][] y, double eta, int batchSize) {
         if (x.length != y.length) {
@@ -330,7 +337,7 @@ public class NeuralNetwork {
      * @return array s such that s[i] = a[i] + b[i]
      */
     private static double[] sum(double[] a, double[] b) {
-        // Validate 
+        // Validate
         if (a.length != b.length) {
             String msg = "Dimension mismatch: a.length = " + a.length +
                     ", b.length = " + b.length;
