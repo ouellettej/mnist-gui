@@ -4,16 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-// TODO - add shading to box indicating network's classification
 
 /**
- * GUI front end for interacting with a neural net 
+ * GUI front end for interacting with a neural net
  */
 public class MNISTGUI extends JFrame {
-    /** Default GUI width in pixels*/
+    /** Default GUI width in pixels */
     private static final int WIDTH = 450;
 
-    /** Default GUI width in pixels*/
+    /** Default GUI width in pixels */
     private static final int HEIGHT = 700;
 
     /** GUI title */
@@ -68,7 +67,7 @@ public class MNISTGUI extends JFrame {
         // Load the training and test data sets
         loadData();
 
-        // Create a 
+        // Create a
         network = new MNISTNeuralNetwork(30);
 
         // Set basic GUI properties
@@ -99,11 +98,10 @@ public class MNISTGUI extends JFrame {
         BoxLayout layout = new BoxLayout(main, BoxLayout.Y_AXIS);
         main.setLayout(layout);
 
-
         GridLayout pixelGrid = new GridLayout(MNISTReader.MNIST_IMAGE_SIZE,
                 MNISTReader.MNIST_IMAGE_SIZE);
         viewer = new JPanel(pixelGrid);
-        viewer.setPreferredSize(new Dimension(400,400));
+        viewer.setPreferredSize(new Dimension(400, 400));
         bars = new JPanel();
         bars.setPreferredSize(new Dimension(400, 100));
         main.add(viewer);
@@ -150,7 +148,7 @@ public class MNISTGUI extends JFrame {
 
         for (int n = 0; n < nEpochs; n++) {
             network.train(trainingImages, trainingLabels,
-                          testImages, testLabels, eta, batchSize);
+                    testImages, testLabels, eta, batchSize);
         }
     }
 
@@ -171,6 +169,7 @@ public class MNISTGUI extends JFrame {
 
     /**
      * Sets the pixels in the viewer to match an MNIST formatted imgae
+     * 
      * @param image - MNIST-formatted image
      */
     private void setViewer(int[][] image) {
@@ -191,19 +190,26 @@ public class MNISTGUI extends JFrame {
     /**
      * Sets the bars underneath the image using the network's output. Bigger
      * bars for a digit indicate the network is more confident of its answer.
+     * 
      * @param networkOutput - output from neural net.
-     * @param correctLabel - actual classification of image.
+     * @param correctLabel  - actual classification of image.
      */
     private void setBars(double[] networkOutput, int correctLabel) {
-        // Normalize output and convert to percentages
+        // Normalize output and convert to percentages. Also figure out which digit the
+        // network thinks is the most likely.
         double sum = 0;
         for (double aLi : networkOutput) {
             sum += aLi;
         }
 
+        int mostLikelyDigit = 0;
         int[] barSizes = new int[10];
         for (int i = 0; i < 10; i++) {
             barSizes[i] = Math.round((float) (100 * networkOutput[i] / sum));
+
+            if (barSizes[i] > barSizes[mostLikelyDigit]) {
+                mostLikelyDigit = i;
+            }
         }
 
         // Reset the bars and redraw
@@ -216,6 +222,11 @@ public class MNISTGUI extends JFrame {
             bar.setValue(barSizes[i]);
             bar.setStringPainted(true);
             bar.setString(Integer.toString(i));
+
+            // Add an indication of what the network's classification is
+            if (i == mostLikelyDigit) {
+                bar.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+            }
 
             // Add an indication of what the correct classification is
             if (i == correctLabel) {
