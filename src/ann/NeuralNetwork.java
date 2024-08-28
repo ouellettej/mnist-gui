@@ -227,8 +227,9 @@ public class NeuralNetwork {
     /**
      * Evaluates the neural network for an input x.
      * 
-     * @param x - input, must be
-     * @return
+     * @param x - input, must be of length {@link #INPUT_SIZE}
+     * @return the network's output, of length {@link #OUTPUT_SIZE}
+     * @throws IllegalArgumentException if x.length != {@link #INPUT_SIZE}
      */
     public double[] evaluate(double[] x) {
         if (x.length != NEURONS[0]) {
@@ -256,6 +257,7 @@ public class NeuralNetwork {
      * @param m - rank-2 array with dimensions nr x nc
      * @param v - array with length nc
      * @return - array with length nr representing m*v
+     * @throws IllegalArgumentException if dimensions of m and v are incompatible
      */
     private static double[] mult(double[][] m, double[] v) {
         // Check dimensions for consistency
@@ -284,6 +286,7 @@ public class NeuralNetwork {
      * 
      * @param m - input matrix
      * @return the transposed matrix
+     * @throws IllegalArgumentException if m has inconsistent dimensions
      */
     private static double[][] transpose(double[][] m) {
         // Validate consistency of dimensions in input matrix
@@ -311,7 +314,8 @@ public class NeuralNetwork {
      *
      * @param a
      * @param b
-     * @return array had such that had[i] = a[i] * b[i]
+     * @return the array had such that had[i] = a[i] * b[i]
+     * @throws IllegalArgumentException if a and b are different sizes
      */
     private static double[] hadamard(double[] a, double[] b) {
         if (a.length != b.length) {
@@ -335,6 +339,7 @@ public class NeuralNetwork {
      * @param a
      * @param b
      * @return array s such that s[i] = a[i] + b[i]
+     * @throws IllegalArgumentException if a and b are different sizes
      */
     private static double[] sum(double[] a, double[] b) {
         // Validate
@@ -359,6 +364,7 @@ public class NeuralNetwork {
      * @param a
      * @param b
      * @return array s such that s[i] = a[i] - b[i]
+     * @throws IllegalArgumentException if a and b are different sizes
      */
     private static double[] diff(double[] a, double[] b) {
         if (a.length != b.length) {
