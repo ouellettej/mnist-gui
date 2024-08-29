@@ -3,4 +3,5 @@ Neural network and graphical front end for handwritten digit recognition using t
 Many thanks to:
 
 1. Michael Neilsen's excellent book "Neural Networks and Deep Learning" (http://neuralnetworksanddeeplearning.com/) which I used as a technical reference for developing the network.
+
 2. Jeff Griffith for the reader (https://github.com/jeffgriffith/mnist-reader)
