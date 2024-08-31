@@ -72,6 +72,7 @@ public class MNISTGUI extends JFrame {
 
         // Set basic GUI properties
         setSize(WIDTH, HEIGHT);
+        setResizable(false);
         setTitle(TITLE);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         addComponents();
